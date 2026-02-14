@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Study Scheduler</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lightweight chart library for visual progress (no AI/ML) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">📚 Smart Study Scheduler</h1>
+            <div class="nav-links">
+                <span id="userInfo" class="user-info"></span>
+                <button id="logoutBtn" class="btn-secondary" style="display: none;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Section -->
+    <div id="authSection" class="container">
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Login</button>
+                <button class="tab-btn" data-tab="register">Register</button>
+            </div>
+            
+            <div id="loginForm" class="auth-form active">
+                <h2>Login</h2>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+                <button type="button" class="link-button" id="forgotPasswordLink">Forgot password?</button>
+            </div>
+
+            <div id="registerForm" class="auth-form">
+                <h2>Register</h2>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="appSection" class="container" style="display: none;">
+        <!-- Dashboard Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-btn" data-tab="subjects">Subjects</button>
+            <button class="tab-btn" data-tab="schedule">Schedule</button>
+            <button class="tab-btn" data-tab="progress">Progress</button>
+            <button class="tab-btn" data-tab="tasks">Upcoming Tasks</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboardTab" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="dashboard-card dashboard-welcome">
+                    <h2 id="dashboardWelcomeTitle">Welcome back</h2>
+                    <p id="dashboardWelcomeSubtitle" class="dashboard-subtitle">
+                        Let’s make steady progress on your subjects today.
+                    </p>
+                    <p id="dashboardReminderBanner" class="dashboard-reminder"></p>
+                    <div class="dashboard-quick-actions">
+                        <button class="btn-primary" id="dashboardQuickAddTaskBtn">+ Quick add task</button>
+                        <button class="btn-secondary" type="button" onclick="switchTab('schedule')">View schedule</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h3>Today&apos;s Tasks</h3>
+                    </div>
+                    <div id="dashboardTodayTasks" class="dashboard-list"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h3>Upcoming Deadlines</h3>
+                    </div>
+                    <div id="dashboardUpcoming" class="dashboard-list"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h3>Study Progress Overview</h3>
+                    </div>
+                    <div id="dashboardProgressSummary" class="dashboard-progress-summary"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h3>Smart suggestion</h3>
+                    </div>
+                    <div id="dashboardSuggestion" class="dashboard-suggestion">
+                        <p>We&apos;ll suggest what to focus on next based on priority, deadlines, and remaining hours.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjects Tab -->
+        <div id="subjectsTab" class="tab-content">
+            <div class="section-header">
+                <h2>My Subjects</h2>
+                <button id="addSubjectBtn" class="btn-primary">+ Add Subject</button>
+            </div>
+            
+            <div id="subjectsList" class="subjects-grid"></div>
+        </div>
+
+        <!-- Schedule Tab -->
+        <div id="scheduleTab" class="tab-content">
+            <div class="section-header">
+                <h2>Study Schedule</h2>
+                <div class="section-header-actions">
+                    <button id="generateScheduleBtn" class="btn-primary">Generate Schedule</button>
+                    <button id="rebalanceScheduleBtn" class="btn-secondary" type="button">Rebalance (missed tasks)</button>
+                </div>
+            </div>
+            
+            <div class="schedule-settings">
+                <h3>Schedule Settings</h3>
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label for="availableHours">Available Hours per Day</label>
+                        <input type="number" id="availableHours" value="4" min="1" max="12" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="maxSessionDuration">Max Session Duration (hours)</label>
+                        <input type="number" id="maxSessionDuration" value="2" min="0.5" max="4" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="breakDuration">Break Duration (hours)</label>
+                        <input type="number" id="breakDuration" value="0.5" min="0" max="2" step="0.25">
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate">
+                    </div>
+                </div>
+            </div>
+
+            <div id="scheduleView" class="schedule-view">
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="daily">Daily View</button>
+                    <button class="view-btn" data-view="weekly">Weekly View</button>
+                </div>
+                <div id="scheduleContent"></div>
+            </div>
+        </div>
+
+        <!-- Progress Tab -->
+        <div id="progressTab" class="tab-content">
+            <div class="section-header">
+                <h2>Study Progress</h2>
+            </div>
+            <div class="progress-layout">
+                <div id="progressContent" class="progress-content"></div>
+                <div class="progress-charts">
+                    <div class="progress-chart-card">
+                        <h3>Completion Overview</h3>
+                        <canvas id="completionChart" aria-label="Overall completion chart" role="img"></canvas>
+                    </div>
+                    <div class="progress-chart-card">
+                        <h3>Study Hours by Day</h3>
+                        <canvas id="dailyHoursChart" aria-label="Daily study hours chart" role="img"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Focus & Break Timer -->
+            <div class="focus-timer">
+                <div class="focus-timer-header">
+                    <div>
+                        <h3>Focus & Break Timer</h3>
+                        <p>Use a simple study–break rhythm to stay fresh.</p>
+                    </div>
+                </div>
+                <div class="focus-timer-body">
+                    <div class="timer-display" id="timerDisplay">25:00</div>
+                    <div class="timer-mode" id="timerModeLabel">Study time</div>
+                    <div class="timer-controls">
+                        <button class="btn-primary" id="startTimerBtn">Start</button>
+                        <button class="btn-secondary" id="pauseTimerBtn">Pause</button>
+                        <button class="btn-secondary" id="resetTimerBtn">Reset</button>
+                    </div>
+                    <div class="timer-settings">
+                        <div class="form-group">
+                            <label for="studyMinutes">Study minutes</label>
+                            <input type="number" id="studyMinutes" value="25" min="5" max="180">
+                        </div>
+                        <div class="form-group">
+                            <label for="breakMinutes">Break minutes</label>
+                            <input type="number" id="breakMinutes" value="5" min="1" max="60">
+                        </div>
+                    </div>
+                    <p class="timer-hint">
+                        The timer alternates between study and break sessions so you take **timely breaks** without needing AI or machine learning.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Tasks Tab -->
+        <div id="tasksTab" class="tab-content">
+            <div class="section-header">
+                <h2>Upcoming Tests, Homework & Assignments</h2>
+                <button id="addTaskBtn" class="btn-primary">+ Add Task</button>
+            </div>
+            <div id="tasksFilters" class="tasks-filters">
+                <div class="form-group">
+                    <label for="taskTypeFilter">Type</label>
+                    <select id="taskTypeFilter">
+                        <option value="all">All</option>
+                        <option value="test">Test / Exam</option>
+                        <option value="assignment">Assignment</option>
+                        <option value="homework">Homework</option>
+                        <option value="project">Project</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="taskStatusFilter">Status</label>
+                    <select id="taskStatusFilter">
+                        <option value="all">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+            <div id="tasksList" class="tasks-list"></div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close forgot-close">&times;</span>
+            <h2>Reset Password</h2>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="forgotUsername">Username</label>
+                    <input type="text" id="forgotUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="forgotNewPassword">New Password</label>
+                    <input type="password" id="forgotNewPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="forgotConfirmPassword">Confirm New Password</label>
+                    <input type="password" id="forgotConfirmPassword" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelForgotBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Subject Modal -->
+    <div id="subjectModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Add Subject</h2>
+            <form id="subjectForm">
+                <input type="hidden" id="subjectId">
+                <div class="form-group">
+                    <label for="subjectName">Subject Name *</label>
+                    <input type="text" id="subjectName" required>
+                </div>
+                <div class="form-group">
+                    <label for="subjectPriority">Priority * (1 = Highest, 5 = Lowest)</label>
+                    <input type="number" id="subjectPriority" min="1" max="5" value="3" required>
+                </div>
+                <div class="form-group">
+                    <label for="subjectDeadline">Deadline *</label>
+                    <input type="date" id="subjectDeadline" required>
+                </div>
+                <div class="form-group">
+                    <label for="subjectHours">Estimated Hours</label>
+                    <input type="number" id="subjectHours" min="0" step="0.5" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="subjectTopics">Topics (comma-separated)</label>
+                    <textarea id="subjectTopics" rows="3" placeholder="e.g., Algebra, Geometry, Calculus"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelSubjectBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close task-close">&times;</span>
+            <h2 id="taskModalTitle">Add Task</h2>
+            <form id="taskForm">
+                <input type="hidden" id="taskId">
+                <div class="form-group">
+                    <label for="taskTitle">Title *</label>
+                    <input type="text" id="taskTitle" placeholder="e.g., Maths Unit Test" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskType">Type *</label>
+                    <select id="taskType" required>
+                        <option value="test">Test / Exam</option>
+                        <option value="assignment">Assignment</option>
+                        <option value="homework">Homework</option>
+                        <option value="project">Project</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="taskDueDate">Due date *</label>
+                    <input type="date" id="taskDueDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskSubject">Subject (optional)</label>
+                    <input type="text" id="taskSubject" placeholder="e.g., Physics, English Literature">
+                </div>
+                <div class="form-group">
+                    <label for="taskNotes">Details</label>
+                    <textarea id="taskNotes" rows="3" placeholder="Chapters covered, question pattern, submission instructions, etc."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelTaskBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

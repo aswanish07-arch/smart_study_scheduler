@@ -1,0 +1,95 @@
+{
+  "1770910899187": {
+    "daily": {
+      "date": "2026-02-11",
+      "sessions": [
+        {
+          "id": "0-0",
+          "subjectId": "1770914668472",
+          "subjectName": "data structure",
+          "startTime": "09:00",
+          "endTime": "11:00",
+          "duration": 2,
+          "topics": [
+            "algorthm",
+            "theory"
+          ],
+          "priority": 3
+        },
+        {
+          "id": "0-1",
+          "subjectId": "1770914668472",
+          "subjectName": "data structure",
+          "startTime": "11:30",
+          "endTime": "13:30",
+          "duration": 2,
+          "topics": [
+            "algorthm",
+            "theory"
+          ],
+          "priority": 3
+        }
+      ],
+      "totalHours": 4
+    },
+    "weekly": [
+      {
+        "date": "2026-02-11",
+        "sessions": [
+          {
+            "id": "0-0",
+            "subjectId": "1770914668472",
+            "subjectName": "data structure",
+            "startTime": "09:00",
+            "endTime": "11:00",
+            "duration": 2,
+            "topics": [
+              "algorthm",
+              "theory"
+            ],
+            "priority": 3
+          },
+          {
+            "id": "0-1",
+            "subjectId": "1770914668472",
+            "subjectName": "data structure",
+            "startTime": "11:30",
+            "endTime": "13:30",
+            "duration": 2,
+            "topics": [
+              "algorthm",
+              "theory"
+            ],
+            "priority": 3
+          }
+        ],
+        "totalHours": 4
+      },
+      {
+        "date": "2026-02-12",
+        "sessions": [
+          {
+            "id": "1-0",
+            "subjectId": "1770914668472",
+            "subjectName": "data structure",
+            "startTime": "09:00",
+            "endTime": "11:00",
+            "duration": 2,
+            "topics": [
+              "algorthm",
+              "theory"
+            ],
+            "priority": 3
+          }
+        ],
+        "totalHours": 2
+      }
+    ],
+    "generatedAt": "2026-02-12T16:44:42.588Z",
+    "settings": {
+      "availableHours": 4,
+      "maxSessionDuration": 2,
+      "breakDuration": 0.5
+    }
+  }
+}
